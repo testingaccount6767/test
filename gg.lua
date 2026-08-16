@@ -1,4 +1,4 @@
-local fx = {version = "V8.6", author = "fx_scripts"}
+local fx = {version = "V8.7", author = "fx_scripts"}
 local TouchLine = {}
 
 local PREMIUM_GOLD = Color3.fromRGB(255, 215, 0)
