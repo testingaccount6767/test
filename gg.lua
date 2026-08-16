@@ -9,11 +9,9 @@ local AIR_ZONE_COLOR = Color3.fromRGB(200, 100, 255)
 local AIR_SECTION_COLOR = Color3.fromRGB(190, 90, 255)
 
 local UPDATE_LOG = {
-  version = "V8.6",
+  version = "V8.7",
   items = {
-    "hitbox fix and add anti-double touch",
-    "Touch burst count and cooldown are now sliders",
-	"auto kick fix and improve"
+   "fixed double touch",
  
   }
 }
@@ -2463,7 +2461,7 @@ end
 HookMobileButtons()
 
 local isCompact = IS_MOBILE
-local window = TouchLine:CreateWindow(isCompact and "TouchLine Free" or "TouchLine Free V8.6", nil, nil, {isPC = not isCompact})
+local window = TouchLine:CreateWindow(isCompact and "TouchLine Free" or "TouchLine Free V8.7", nil, nil, {isPC = not isCompact})
 
 local MainTab = window:AddTab("Main")
 local VisualTab = window:AddTab("Visual")
@@ -2701,7 +2699,7 @@ pcall(function()
 	end
 end)
 
-TouchLine:CreateNotification("TouchLine " .. fx.version, "Hitbox rebuilt - no more double touches. Check the Visual tab for themes.", 6)
+TouchLine:CreateNotification("TouchLine " .. fx.version, "premuim gone be paid only buy it before it epensive. ", 6)
 task.delay(7, function()
 	local items = table.concat(UPDATE_LOG.items or {}, " | ")
 	TouchLine:CreateNotification("UPDATE LOG " .. (UPDATE_LOG.version or fx.version), items, 8)
