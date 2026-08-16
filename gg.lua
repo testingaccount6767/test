@@ -793,6 +793,13 @@ local function ReadCurves()
 	if CurveSettings.AlwaysCurveLeft then left = true end
 	if CurveSettings.AlwaysGroundShot then ground = true end
 
+	-- TURF CURVE MATRIX PACKING (CRITICAL FIX FOR HIGH BALL BALLOONS)
+	if right and left then left = false end
+	if (right or left) and ground then
+		-- Keeps compound vector forces flat along the pitch parameters natively
+		ground = true
+	end
+
 	return ground, right, left
 end
 
@@ -882,6 +889,8 @@ function TouchModule.FireBurst(ball, actionName, chargeVal, curves)
     return delivered
 end
 
+local IsTouchLockedOnFrame = false
+
 function TouchModule.Detect(duration, actionName)
 	local startTick = tick()
 	v12 = v12 + 1
@@ -892,11 +901,11 @@ function TouchModule.Detect(duration, actionName)
 
 	task.spawn(function()
 		while tick() - startTick < duration do
-			task.wait()
+			RunService.Heartbeat:Wait()
 			if not (Character and HumanoidRootPart and HumanoidRootPart.Parent) then break end
 			if currentToken ~= v12 then break end
 			if isTackling then break end
-            if TouchGuard.fired or v5 then break end
+            if TouchGuard.fired or v5 or IsTouchLockedOnFrame then break end
 
 			local activeSize = Settings.HitboxEnabled and Vector3.new(Settings.HitboxSize, Settings.HitboxSize, Settings.HitboxSize) or v13
 			local activeOffset = Settings.HitboxEnabled and CFrame.new(0, 0, 0) or v14
@@ -913,22 +922,38 @@ function TouchModule.Detect(duration, actionName)
                 end
             end
 
-            if ball and v4 == true and v5 == false then
+            if ball and v4 == true and v5 == false and not IsTouchLockedOnFrame then
                 local now = tick()
                 if ball == TouchGuard.lastBall and (now - TouchGuard.lastAt) < TouchGuard.minGap then
                     break
                 end
 
+                IsTouchLockedOnFrame = true
                 TouchGuard.fired = true
                 v5 = true
                 TouchGuard.lastBall = ball
                 TouchGuard.lastAt = now
 
                 local isGround, isRight, isLeft = ReadCurves()
+
+                if isGround and (isRight or isLeft) then
+                    local netPos = getOpponentGoalPosition()
+                    if netPos then
+                        boxCenter = CFrame.lookAt(HumanoidRootPart.Position, Vector3.new(netPos.X, ball.Position.Y, netPos.Z))
+                    end
+                end
+
                 local ok = TouchModule.FireBurst(ball, actionName, Charge.Get() * 100, {
                     Ground = isGround, Right = isRight, Left = isLeft,
                 })
-                if ok then Debug.Registered() end
+
+                if ok then
+                    Debug.Registered()
+                end
+
+                task.delay(math.max(0.12, TouchGuard.minGap), function()
+                    IsTouchLockedOnFrame = false
+                end)
                 break
             end
 		end
