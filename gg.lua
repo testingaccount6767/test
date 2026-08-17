@@ -2699,10 +2699,10 @@ pcall(function()
 	end
 end)
 
-TouchLine:CreateNotification("TouchLine " .. fx.version, "premuim gone be paid only buy it before it epensive. ", 6)
 task.delay(7, function()
 	local items = table.concat(UPDATE_LOG.items or {}, " | ")
 	TouchLine:CreateNotification("UPDATE LOG " .. (UPDATE_LOG.version or fx.version), items, 8)
 end)
 
 return TouchLine
+
